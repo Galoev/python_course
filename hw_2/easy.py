@@ -1,40 +1,26 @@
-from pickletools import read_uint1
-from unittest import result
+from functools import reduce
 
-from matplotlib.pyplot import table
+
+def generate_table_head(cols):
+    return " {" + reduce(lambda el_prev, el: el_prev + "c|", range(cols), "|") + "} "
 
 def generate_table(data, rows, cols):
-    result = "\\begin{tabular} "
+    result = "\\begin{tabular} " + generate_table_head(cols)
     
-    result += "{|"
-    for i in range(cols):
-        result += "c|"
-    result += "} "
     result += "\\hline "
-
     for i in range(rows):
         result += ' & '.join(map(str, data[i]))
         result += "\\\\"
         result += " \\hline "
 
-    result += "\\end{tabular}"
-    return result
+    return result + "\\end{tabular}"
 
 def generate_latex(table):
-    head = "\\documentclass{article}\\usepackage[utf8]{inputenc}\\begin{document}"
-    end = "\\end{document}"
-
-    result = head
-    
-    rows = len(table)
-    cols = len(table[0])
-
-    result += generate_table(table, rows, cols)    
-    result += end
-
-    return result
+    return "\\documentclass{article}\\usepackage[utf8]{inputenc}\\begin{document}" + \
+            generate_table(table, len(table), len(table[0])) + \
+            "\\end{document}"
 
 if __name__ == "__main__":
-    table = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    table = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
     with open('artifacts/table.tex', 'w') as f:
         f.write(generate_latex(table)) 
